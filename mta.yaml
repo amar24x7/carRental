@@ -1,0 +1,67 @@
+_schema-version: '3.2'
+ID: carrental
+version: 0.0.1
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
+
+modules:
+  # ---------------- DATABASE DEPLOYER MODULE ------------------
+  - name: carrental-db-deployer
+  # ------------------------------------------------------------
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 1024M
+    requires:
+      - name: carrental-db
+        properties:                   
+          TARGET_CONTAINER: carrental_HDI    
+
+  # --------------------- SERVER MODULE ------------------------
+  - name: carrental-srv
+  # ------------------------------------------------------------
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 512M
+      disk-quota: 1024M
+    requires:
+      - name: carrental-db
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+
+
+
+resources:
+
+
+
+
+  # ------------------- HDI CONTAINER SERVICE ------------------
+  - name: carrental-db
+  # ------------------------------------------------------------
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+      service-name: carrental_HDI  
+      config:                               
+         schema: carrental_HDI      
+    properties:
+      hdi-service-name: ${service-name}
+
+
+
