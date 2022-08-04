@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Business Application",
   "dependencies": {
-    "@sap/cds": "^4",
+    "@sap/cds": "^5",
     "@sap/audit-logging": "^3",
     "@sap/hana-client": "^2",
     "debug": "^4.3",
